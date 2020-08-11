@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card } from 'react-bootstrap';
 import BackgroundImage from './Flower-garden.jpg';
 import { connect } from 'react-redux';
 import { requestContact } from '../constants/action';
+import { MdEmail, MdLocationOn } from 'react-icons/md'
 
 const mapStateToProps = (state) => {
   return {
@@ -20,11 +21,25 @@ const mapDispatchToProps = (dispatch) => {
 const DetailContact = ({ contact, isPending, onRequestContact }) => {
   const { id } = useParams();
 
+  const [favourits, setFavourits] = useState([])
+
   useEffect(() => {
     onRequestContact(id)
+    if (localStorage.getItem('fav')) {
+      setFavourits(localStorage.getItem('fav'))
+    }
   }, [])
 
-  console.log(contact.first_name)
+  const setFollow = (id) => {
+    let saved = [contact.id]
+    if (favourits.length === 0) {
+      localStorage.setItem('fav', JSON.stringify(saved))
+      setFavourits(saved)
+    } else if (favourits.length > 0) {
+      localStorage.removeItem('fav')
+      setFavourits(saved)
+    }
+  }
 
   return (
     <>
@@ -43,9 +58,13 @@ const DetailContact = ({ contact, isPending, onRequestContact }) => {
                   <Card.Text className="justify-content-center" >
                     Designer, cart lover, bookworm, pie, fanatic and nature enthusiast
                   </Card.Text>
-                  <div className="center col-8" style={{ margin: '40px auto 20px auto', fontSize: 12 }}>
-                    <p className="float-left">Location</p>
-                    <p className="float-right">Email</p>
+                  <div className="center col-10" style={{ margin: '40px auto 20px auto', fontSize: 16 }}>
+                    <p className="float-left">
+                      <MdLocationOn style={{ fontSize: 20 }} /> Location
+                      </p>
+                    <p className="float-right">
+                      <MdEmail style={{ fontSize: 20 }} /> {contact.email}
+                    </p>
                   </div>
                   <div className="card" style={{ width: '100%' }}>
                     <div className="card-body row text-center">
@@ -62,8 +81,11 @@ const DetailContact = ({ contact, isPending, onRequestContact }) => {
                   </div>
                   {/* </div> */}
                 </Card.Body>
-                <Card.Footer className="btn btn-success bg-success">
-                  Follow
+                <Card.Footer className="btn btn-success bg-success" onClick={() => setFollow(contact.id)}>
+                  {
+                    localStorage.getItem('fav') && localStorage.getItem('fav').includes(contact.id)
+                      ? 'Followed'
+                      : 'Follow'}
                 </Card.Footer>
               </Card>
             </div>

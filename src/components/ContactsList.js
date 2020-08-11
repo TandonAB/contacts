@@ -24,4 +24,4 @@ const ContactsList = ({ contacts }) => {
   )
 }
 
-export default ContactsList;
+export default React.memo(ContactsList);
